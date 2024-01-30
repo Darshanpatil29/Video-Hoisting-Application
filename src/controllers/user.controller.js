@@ -236,7 +236,6 @@ const changeCurrentPassword=asyncHandler(async(req,res)=>{
 
 const forgotPassword=asyncHandler(async(req,res)=>{
    const {email}=req.body;
-   console.log(email);
    if(!email){
     throw new ApiError(401,"enter Valid Email");
    }
