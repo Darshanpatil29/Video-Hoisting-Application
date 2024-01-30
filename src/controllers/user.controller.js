@@ -278,6 +278,7 @@ const forgotPassword=asyncHandler(async(req,res)=>{
 const updatePassword=asyncHandler(async(req,res)=>{
    try {
      const{newPassword,incomingToken}=await req.body;
+     console.log(incomingToken)
      if(!incomingToken){
          throw new ApiError(401,"Unauthorized request");
     }
