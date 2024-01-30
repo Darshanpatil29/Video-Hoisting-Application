@@ -138,6 +138,7 @@ const loginUser=asyncHandler(async(req,res)=>{
     }
 
     const isPasswordValide=await existedUser.isPasswordCorrect(password);
+    console.log(isPasswordValide);
 
     if(!isPasswordValide){
         throw new ApiError(401,"Invalid Credentials");
@@ -244,7 +245,6 @@ const forgotPassword=asyncHandler(async(req,res)=>{
     throw new ApiError(401,"User does not exist!!");
    }
    const resetToken=await existedUser.generateResetToken();
-   console.log(resetToken)
    existedUser.passwordResetToken=resetToken;
    await existedUser.save({validateBeforeSave:false});
     const transporter=nodemailer.createTransport({
@@ -256,7 +256,6 @@ const forgotPassword=asyncHandler(async(req,res)=>{
         pass:process.env.PASSWORD
     }
    });
-   console.log(transporter);
    const data={
     from:process.env.EMAIL_ID,
     to:email,
@@ -267,10 +266,6 @@ const forgotPassword=asyncHandler(async(req,res)=>{
     `,
    }
    console.log(data);
-//    const resetToken=req.cookies.refreshToken || req.body.refreshToken;
-//    if(!resetToken){
-//     throw new ApiError(401,"Token Expired");
-//    };
   try {
         transporter.sendMail(data);
           return res.status(200).json(new ApiResponse(200,{},"Email send successfuly"));
@@ -281,15 +276,23 @@ const forgotPassword=asyncHandler(async(req,res)=>{
 });
 
 const updatePassword=asyncHandler(async(req,res)=>{
-    const{newPassword}=req.body;
-    const id=req.user._id;
-    await User.findByIdAndUpdate(id,{
-        $set:{resetToken:undefined,}
-    });
-    User.password=newPassword;
-    User.save({validateBeforeSave:false});
-    return res.status(200).json(new ApiResponse(200,{},"Password reset successfull!!"))
-    
+   try {
+     const{newPassword,incomingToken}=await req.body;
+     if(!incomingToken){
+         throw new ApiError(401,"Unauthorized request");
+    }
+     const decodedToken=jwt.verify(incomingToken,process.env.RESET_TOKEN_SECRET);
+     const id=decodedToken._id;
+     // const id=req.user._id;
+     const user=await User.findByIdAndUpdate(id,{
+         $set:{resetToken:undefined,}
+     });
+    user.password=newPassword;
+    await user.save({validateBeforeSave:false});
+     return res.status(200).json(new ApiResponse(200,{},"Password reset successfull!!"))
+   } catch (error) {
+    throw new ApiError(500,"Internal server error");
+   }
 });
 
-export {registerUser,loginUser,logOutUser,refreshAccessToken,forgotPassword,updatePassword};
+export {registerUser,loginUser,logOutUser,refreshAccessToken,changeCurrentPassword,forgotPassword,updatePassword};

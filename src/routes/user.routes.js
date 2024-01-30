@@ -38,7 +38,6 @@ userRoutes.route('/forgot-password').post(
 )
 
 userRoutes.route('/update-password').post(
-    verifyJWT,
     updatePassword
 )
 export {userRoutes};
