@@ -295,4 +295,39 @@ const updatePassword=asyncHandler(async(req,res)=>{
    }
 });
 
-export {registerUser,loginUser,logOutUser,refreshAccessToken,changeCurrentPassword,forgotPassword,updatePassword};
+const getUserDetails=asyncHandler(async(req,res)=>{
+    return res.status(200).json(new ApiResponse(200,"User details retrived successfully!",req.user));
+});
+
+const updateUserDetails=asyncHandler(async(req,res)=>{
+    const {email,fullname}=req.body;
+    if(!email || !fullname){
+        throw new ApiError(400,"User not found!!");
+    }
+    const id=req.user._id;
+    const existedUser=await User.findByIdAndUpdate(id,{$set:{email:email,fullname:fullname}},{new:true}).select("-password -refreshToken -passwordResetToken");
+    return res.status(200).json(new ApiResponse(200,"User details updated successfully",existedUser));
+});
+
+const updateUserAvatar=asyncHandler(async(req,res)=>{
+    const avatarLocalPath=req.file?.path;
+    if(!avatarLocalPath){
+        throw new ApiError(400,"Avatar file missing");
+    }
+    const avatar=await uploadFile(avatarLocalPath);
+    console.log(avatar);
+    if(!avatar.url){
+        throw new ApiError(400,"File not uploaded!");
+    }
+    const id=req.user._id;
+   const existedUser=await User.findByIdAndUpdate(id,{
+    $set:{
+        avatar:avatar.url
+    },
+   },
+   {new :true});
+    return res.status(200).json(
+        new ApiResponse(200,"Avatar updated sucessfully!",existedUser.avatar)   
+    );
+});
+export {registerUser,loginUser,logOutUser,refreshAccessToken,changeCurrentPassword,forgotPassword,updatePassword,getUserDetails,updateUserDetails,updateUserAvatar};
