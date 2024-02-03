@@ -1,12 +1,12 @@
 import mongoose,{ Schema } from "mongoose";
-import { User } from "./user.models";
+import { User } from "./user.models.js";
 
 const subscriptionSchema=new Schema({
-    subscriber:{
+    subscriber:{         // no. of subscribers
         type:Schema.Types.ObjectId,
         ref:"User"
     },
-    channel:{
+    channel:{            // Subscribed channels
         type:Schema.Types.ObjectId,
         ref:"User"
     },

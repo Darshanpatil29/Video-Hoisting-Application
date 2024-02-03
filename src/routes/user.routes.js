@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { changeCurrentPassword, forgotPassword, getUserDetails, logOutUser, loginUser, registerUser, updatePassword, updateUserAvatar, updateUserDetails } from "../controllers/user.controller.js";
+import { changeCurrentPassword, forgotPassword, getUserChannelProfile, getUserDetails, getWatchHistory, logOutUser, loginUser, registerUser, updatePassword, updateUserAvatar, updateUserDetails } from "../controllers/user.controller.js";
 import {upload} from "../middlewares/multer.middleware.js"
 import { verifyJWT } from "../middlewares/auth.middleware.js";
 import { refreshAccessToken } from "../controllers/user.controller.js";
@@ -23,18 +23,18 @@ userRoutes.route('/login').post(
     loginUser
 )
 
-userRoutes.route('/user-details').post(
+userRoutes.route('/user-details').get(
     verifyJWT,
     getUserDetails
 )
 
-userRoutes.route('/update-user-details').post(
+userRoutes.route('/update-user-details').patch( // patch used because it modifies only that part of resource instead of whole document
     verifyJWT,
     updateUserDetails
 )
-userRoutes.route('/update-avatar').post(
-    upload.single("avatar"),
+userRoutes.route('/update-avatar').patch(
     verifyJWT,
+    upload.single("avatar"),
     updateUserAvatar
 )
 
@@ -44,7 +44,7 @@ userRoutes.route('/logOut').post(
     logOutUser
 )
 
-userRoutes.route('/refreshToken').post(
+userRoutes.route('/refresh-token').post(
     refreshAccessToken
 )
 
@@ -52,11 +52,23 @@ userRoutes.route('/forgot-password').post(
     forgotPassword
 )
 
-userRoutes.route('/update-password').post(
+userRoutes.route('/update-password').patch(
     updatePassword
 )
 
 userRoutes.route('/change-password').post(
+    verifyJWT,
     changeCurrentPassword
 )
+
+userRoutes.route('/channel/:username').get(
+    verifyJWT,
+    getUserChannelProfile
+)
+
+userRoutes.route('/watch-history').get(
+    verifyJWT,
+    getWatchHistory
+)
+
 export {userRoutes};
