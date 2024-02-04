@@ -7,6 +7,7 @@ import jwt  from "jsonwebtoken";
 import nodemailer from "nodemailer";
 import fs from 'fs';
 import mongoose from "mongoose";
+import { channel } from "diagnostics_channel";
 
 const generateAccessAndRefreshToken=async(userId)=>{
     try {
@@ -441,5 +442,4 @@ const getWatchHistory=asyncHandler(async(req,res)=>{
         new ApiResponse(200,"Watch histroy fetched successfully",user[0].watchHistory)
     )
 });
-
 export {registerUser,loginUser,logOutUser,refreshAccessToken,changeCurrentPassword,forgotPassword,updatePassword,getUserDetails,updateUserDetails,updateUserAvatar,getUserChannelProfile,getWatchHistory};
