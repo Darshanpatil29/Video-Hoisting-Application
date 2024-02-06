@@ -6,11 +6,107 @@ import {ApiResponse} from "../utils/ApiResponse.js"
 import {asyncHandler} from "../utils/asyncHandler.js"
 import {deleteFile, uploadFile} from "../utils/cloudinary.js"
 import { response } from "express"
-const getAllVideos = asyncHandler(async (req, res) => {
-    const { page = 1, limit = 10, query, sortBy, sortType, userId } = req.query
-    //TODO: get all videos based on query, sort, pagination
-})
 
+    const getAllVideos = asyncHandler(async (req, res) => {
+        const { page = 1, limit = 10, query = " ", sortBy, sortType, userId } = req.query
+        //TODO: get all videos based on query, sort, pagination
+    
+    
+        const options ={
+            page,
+            limit
+        }
+    
+        const videosAggregate = [
+            {
+                $match:{
+                    $and:[
+                        {
+                            isPublished:true
+                        },
+                        {
+                            $text:{
+                                $search:query
+                            }
+                        }
+                    ]
+                }
+            },
+            {
+                $addFields:{
+                    score:{
+                        $meta:"textScore"
+                    }
+                }
+            },
+            {
+                $lookup:{
+                    from:"users",
+                    localField:"owner",
+                    foreignField:"_id",
+                    as:"owner",
+                    pipeline:[
+                        {
+                            $lookup:{
+                                from:"subscriptions",
+                                localField:"_id",
+                                foreignField:"channel",
+                                as:"subscribers"
+                            }
+                        },
+                        {
+                            $addFields:{
+                                subscriberCount:{
+                                    $size:"$subscribers"
+                                },
+                                isSubscribed:{
+                                    $cond:{
+                                    if:{$in:[req.user._id,"$subscribers.subscriber"]},
+                                    then:true,
+                                    else:false
+                                }
+                            }
+                            }
+                        },
+                        {
+                            $project:{
+                                username:1,
+                                fullname:1,
+                                avatar:1,
+                                subscriberCount:1,
+                                isSubscribed:1
+                            }
+                        }
+                    ]
+                }
+            },
+            {
+                $addFields:{
+                    owner:{
+                        $first:"$owner"
+                    }
+                }
+            },
+            {
+                $sort:{
+                    score:-1,
+                    views:-1
+                }
+            }
+        ];
+        console.log("Before aggregation:", videosAggregate);
+        const videos = await Video.aggregatePaginate(videosAggregate,options);
+        console.log("after aggregation:", videos);
+        if (!videos) {
+            throw new ApiError(500,"something want wrong while get all videos");
+        }
+    
+        return res
+        .status(200)
+        .json(
+            new ApiResponse(200,"get all videos successfully",videos)
+        )
+    })
 
 const publishAVideo = asyncHandler(async (req, res) => {
     const { title, description} = req.body
