@@ -28,11 +28,17 @@ app.use(cookieParser());
 
 import {userRoutes} from './routes/user.routes.js';
 import { videoRoutes } from './routes/video.routes.js';
+import { subscribeRoutes } from './routes/subscription.routes.js';
+import { playlistRoutes } from './routes/playlist.routes.js';
 // routes declaration
 
 app.use("/api/v1/users",userRoutes);
 
 app.use("/api/v1/videos",videoRoutes);
+
+app.use("/api/v1/subscriptions",subscribeRoutes);
+
+app.use("/api/v1/playlists",playlistRoutes);
 
 // http://localhost:8000/api/v1/users/register
 

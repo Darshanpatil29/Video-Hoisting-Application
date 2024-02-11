@@ -11,15 +11,16 @@ const playlistSchema=new Schema({
         type:String,
         trim:true
     },
-    videos:{
+    videos:[{
         type:Schema.Types.ObjectId,
         ref:"Video"
-    },
+    }],
     owner:{
         type:Schema.Types.ObjectId,
         ref:"User"
     }
-},{timestamps:true});
+},
+{timestamps:true});
 
 playlistSchema.plugin(mongooseAggregatePaginate);
 
