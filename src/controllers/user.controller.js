@@ -7,7 +7,6 @@ import jwt  from "jsonwebtoken";
 import nodemailer from "nodemailer";
 import fs from 'fs';
 import mongoose from "mongoose";
-import { channel } from "diagnostics_channel";
 
 const generateAccessAndRefreshToken=async(userId)=>{
     try {
@@ -386,7 +385,7 @@ const getUserChannelProfile=asyncHandler(async(req,res)=>{
             }
         }
     ]);
-    console.log(channel);
+
     if(!channel?.length){
         throw new ApiError(400,"Channel not found")
     }
