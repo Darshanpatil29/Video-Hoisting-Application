@@ -31,6 +31,7 @@ import { videoRoutes } from './routes/video.routes.js';
 import { subscribeRoutes } from './routes/subscription.routes.js';
 import { playlistRoutes } from './routes/playlist.routes.js';
 import { commentRouter } from './routes/comments.routes.js';
+import { likesRouter } from './routes/likes.routes.js';
 // routes declaration
 
 app.use("/api/v1/users",userRoutes);
@@ -42,17 +43,8 @@ app.use("/api/v1/subscriptions",subscribeRoutes);
 app.use("/api/v1/playlists",playlistRoutes);
 
 app.use("/api/v1/comments",commentRouter)
+
+app.use("/api/v1/likes",likesRouter)
 // http://localhost:8000/api/v1/users/register
 
-
-
-
-
-
-
-
-
-
-
-// Export the configured Express app for use in other modules
 export { app };
