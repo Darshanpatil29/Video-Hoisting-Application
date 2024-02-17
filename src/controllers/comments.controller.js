@@ -132,7 +132,6 @@ const updateComment = asyncHandler(async (req, res) => {
 const deleteComment = asyncHandler(async (req, res) => {
     // TODO: delete a comment
     const {commentId} = req.params
-    // TODO: delete playlist
     if (!commentId) {
         throw new ApiError(400,"commentId required");
     }
