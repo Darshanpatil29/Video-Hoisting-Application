@@ -30,16 +30,20 @@ const createTweet = asyncHandler(async (req, res) => {
 
 const getUserTweets = asyncHandler(async (req, res) => {
     // TODO: get user tweets
-    const {owner}=req.params
+    const {userId}=req.params
 
-    if(!owner || !isValidObjectId(owner)){
+    if(!userId){
         throw new ApiError(401,"Invalid user Id")
+    }
+
+    if (!isValidObjectId(userId)) {
+        throw new ApiError(401, "Invalid Video Id");
     }
 
     const userTweets=await Tweet.aggregate([
         {
             $match:{
-                owner:new mongoose.Types.ObjectId(owner)
+                owner:new mongoose.Types.ObjectId(userId)
             }
         },
         {
