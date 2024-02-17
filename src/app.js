@@ -32,9 +32,11 @@ import { subscribeRoutes } from './routes/subscription.routes.js';
 import { playlistRoutes } from './routes/playlist.routes.js';
 import { commentRouter } from './routes/comments.routes.js';
 import { likesRouter } from './routes/likes.routes.js';
+import { tweetsRouter } from './routes/tweets.routes.js';
 // routes declaration
 
 app.use("/api/v1/users",userRoutes);
+// http://localhost:8000/api/v1/users/register
 
 app.use("/api/v1/videos",videoRoutes);
 
@@ -42,9 +44,11 @@ app.use("/api/v1/subscriptions",subscribeRoutes);
 
 app.use("/api/v1/playlists",playlistRoutes);
 
-app.use("/api/v1/comments",commentRouter)
+app.use("/api/v1/comments",commentRouter);
 
-app.use("/api/v1/likes",likesRouter)
-// http://localhost:8000/api/v1/users/register
+app.use("/api/v1/likes",likesRouter);
+
+app.use("/api/v1/tweets",tweetsRouter);
+
 
 export { app };

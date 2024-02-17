@@ -12,7 +12,8 @@ const tweetsSchema=new Schema({
         trim:true,
         required:true
     }
-},{timestamps:true});
+},
+{timestamps:true});
 
 tweetsSchema.plugin(mongooseAggregatePaginate);
 export const Tweet=new mongoose.model("Tweet",tweetsSchema);
