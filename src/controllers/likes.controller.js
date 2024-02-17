@@ -115,11 +115,132 @@ const toggleTweetLike = asyncHandler(async (req, res) => {
 
 const getLikedVideos = asyncHandler(async (req, res) => {
     //TODO: get all liked videos
+    const likedVideos=await Like.aggregate([
+        {
+            $match:{
+                $and:[
+                    {
+                        video:{ $exists:true}
+                    },{
+                        likedBy:ObjectId('65b7ef5f2c38f1df8964f645')
+                    }
+                ]
+            }
+        },
+        {
+            $lookup:{
+                from:"videos",
+                localField:"video",
+                foreignField:"_id",
+                as:"video"
+            }
+        },
+  {
+    $addFields: {
+      video:{$first:"$video"}
+    }
+  },{
+    $project: {
+      video:1
+    }
+  }
+    ])
+    if(!likedVideos){
+        throw new ApiError(401,"Unable to fetched liked videos")
+    }
+    return res.status(200)
+    .json(
+        new ApiResponse(200,"Liked videos fetched successfully",likedVideos)
+    )
+})
+
+const getLikedComments = asyncHandler(async (req, res) => {
+    //TODO: get all liked videos
+    const likedComments=await Like.aggregate([
+        {
+            $match:{
+                $and:[
+                    {
+                        comment:{ $exists:true}
+                    },{
+                        likedBy:ObjectId('65b7ef5f2c38f1df8964f645')
+                    }
+                ]
+            }
+        },
+        {
+            $lookup:{
+                from:"comments",
+                localField:"comment",
+                foreignField:"_id",
+                as:"comment"
+            }
+        },
+  {
+    $addFields: {
+      comment:{$first:"$comment"}
+    }
+  },{
+    $project: {
+      comment:1
+    }
+  }
+    ])
+    if(!likedComments){
+        throw new ApiError(401,"Unable to fetched liked comments")
+    }
+    return res.status(200)
+    .json(
+        new ApiResponse(200,"Liked comments fetched successfully",likedComments)
+    )
+})
+
+const getLikedTweets = asyncHandler(async (req, res) => {
+    //TODO: get all liked videos
+    const likedTweets=await Like.aggregate([
+        {
+            $match:{
+                $and:[
+                    {
+                        tweet:{ $exists:true}
+                    },{
+                        likedBy:ObjectId('65b7ef5f2c38f1df8964f645')
+                    }
+                ]
+            }
+        },
+        {
+            $lookup:{
+                from:"tweets",
+                localField:"tweet",
+                foreignField:"_id",
+                as:"tweet"
+            }
+        },
+  {
+    $addFields: {
+      tweet:{$first:"$tweet"}
+    }
+  },{
+    $project: {
+      tweet:1
+    }
+  }
+    ])
+    if(!likedTweets){
+        throw new ApiError(401,"Unable to fetched liked tweets")
+    }
+    return res.status(200)
+    .json(
+        new ApiResponse(200,"Liked tweets fetched successfully",likedTweets)
+    )
 })
 
 export {
     toggleCommentLike,
     toggleTweetLike,
     toggleVideoLike,
-    getLikedVideos
+    getLikedVideos,
+    getLikedComments,
+    getLikedTweets,
 }
