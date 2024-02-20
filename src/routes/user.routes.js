@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { changeCurrentPassword, forgotPassword, getUserChannelProfile, getUserDetails, getWatchHistory, logOutUser, loginUser, registerUser, updatePassword, updateUserAvatar, updateUserDetails } from "../controllers/user.controller.js";
+import { addVideoToWatchHistory, changeCurrentPassword, forgotPassword, getUserChannelProfile, getUserDetails, getWatchHistory, logOutUser, loginUser, registerUser, updatePassword, updateUserAvatar, updateUserDetails } from "../controllers/user.controller.js";
 import {upload} from "../middlewares/multer.middleware.js"
 import { verifyJWT } from "../middlewares/auth.middleware.js";
 import { refreshAccessToken } from "../controllers/user.controller.js";
@@ -38,6 +38,10 @@ userRoutes.route('/update-avatar').patch(
     updateUserAvatar
 )
 
+userRoutes.route('/add-to-Watch-History/:videoId').patch(
+    verifyJWT,
+    addVideoToWatchHistory
+)
 // secured routes
 userRoutes.route('/logOut').post(
     verifyJWT,

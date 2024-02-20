@@ -21,7 +21,6 @@ const generateAccessAndRefreshToken=async(userId)=>{
     }
 }
 
-
 const registerUser=asyncHandler(async(req,res)=>{
     // res.status(200).json({
     //     message:"ok"
@@ -442,4 +441,31 @@ const getWatchHistory=asyncHandler(async(req,res)=>{
         new ApiResponse(200,"Watch histroy fetched successfully",user[0].watchHistory)
     )
 });
-export {registerUser,loginUser,logOutUser,refreshAccessToken,changeCurrentPassword,forgotPassword,updatePassword,getUserDetails,updateUserDetails,updateUserAvatar,getUserChannelProfile,getWatchHistory};
+
+const addVideoToWatchHistory=(async(req,res)=>{
+        const {videoId} = req.params;
+    
+        if (!videoId) {
+            throw new ApiError(400,"videoId is required");
+        }
+    
+        const user = await User.findByIdAndUpdate(
+            req.user?._id,
+            {
+                $push:{watchHistory:new mongoose.Types.ObjectId(videoId)}
+            }
+        )
+    
+        if (!user) {
+            throw new ApiError(500,"Error on addVideoToWatchHistory");
+        }
+    
+        return res
+        .status(200)
+        .json(
+            new ApiResponse(200,{},"video added on watch history successfully")
+        )
+    
+})
+export {registerUser,loginUser,logOutUser,refreshAccessToken,changeCurrentPassword,forgotPassword,updatePassword,
+        getUserDetails,updateUserDetails,updateUserAvatar,getUserChannelProfile,getWatchHistory,addVideoToWatchHistory};
