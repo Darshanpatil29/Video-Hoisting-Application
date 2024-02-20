@@ -94,9 +94,7 @@ import { response } from "express"
                 }
             }
         ];
-        console.log("Before aggregation:", videosAggregate);
         const videos = await Video.aggregatePaginate(videosAggregate,options);
-        console.log("after aggregation:", videos);
         if (!videos) {
             throw new ApiError(500,"something want wrong while get all videos");
         }
@@ -247,7 +245,6 @@ const getVideoById = asyncHandler(async (req, res) => {
             }
         }
     ])
-    console.log(video[0]);
 return res
 .status(200)
 .json(
