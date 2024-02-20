@@ -33,6 +33,7 @@ import { playlistRoutes } from './routes/playlist.routes.js';
 import { commentRouter } from './routes/comments.routes.js';
 import { likesRouter } from './routes/likes.routes.js';
 import { tweetsRouter } from './routes/tweets.routes.js';
+import { desktopRoutes } from './routes/desktop.routes.js';
 // routes declaration
 
 app.use("/api/v1/users",userRoutes);
@@ -50,5 +51,6 @@ app.use("/api/v1/likes",likesRouter);
 
 app.use("/api/v1/tweets",tweetsRouter);
 
+app.use("/api/v1/channel",desktopRoutes)
 
 export { app };
