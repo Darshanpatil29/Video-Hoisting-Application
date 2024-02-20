@@ -6,17 +6,25 @@ import {ApiResponse} from "../utils/ApiResponse.js"
 import {asyncHandler} from "../utils/asyncHandler.js"
 import {deleteFile, uploadFile} from "../utils/cloudinary.js"
 import { response } from "express"
+import NodeCache from 'node-cache';
+const cache = new NodeCache({ stdTTL: 300, checkperiod: 60 }); 
 
-    const getAllVideos = asyncHandler(async (req, res) => {
-        const { page = 1, limit = 10, query = " ", sortBy, sortType, userId } = req.query
-        //TODO: get all videos based on query, sort, pagination
-    
-    
-        const options ={
+const getAllVideos = asyncHandler(async (req, res) => {
+    const { page = 1, limit = 10, query = " ", sortBy, sortType, userId } = req.query
+    //TODO: get all videos based on query, sort, pagination
+   const options ={
             page,
             limit
         }
+        const cacheKey = `allVideos_${JSON.stringify(req.query)}`;
+
+    const cachedData = cache.get(cacheKey);
     
+    if (cachedData) {
+        console.log('Data retrieved from cache');
+        return res.status(200).json(new ApiResponse(200, 'Get all videos successfully', cachedData));
+    }
+
         const videosAggregate = [
             {
                 $match:{
@@ -98,7 +106,7 @@ import { response } from "express"
         if (!videos) {
             throw new ApiError(500,"something want wrong while get all videos");
         }
-    
+        cache.set(cacheKey, videos);
         return res
         .status(200)
         .json(
@@ -150,6 +158,7 @@ const publishAVideo = asyncHandler(async (req, res) => {
     if(!createdVideo){
         throw new ApiError(401,"Video is not uploaded in db");
     }
+    cache.del('allVideos','video');
     return res
     .status(200)
     .json(
@@ -166,6 +175,14 @@ const getVideoById = asyncHandler(async (req, res) => {
     if(!mongoose.isValidObjectId(videoId)){
         throw new ApiError(401,"Video not found!!")
     }
+    const cacheKey = `Video_${videoId}`;
+
+    const cachedData = cache.get(cacheKey);
+    if (cachedData) {
+        console.log('Data retrieved from cache');
+        return res.status(200).json(new ApiResponse(200, 'Get all videos successfully', cachedData));
+    }
+
     const video=await Video.aggregate([
         {
             $match:{
@@ -240,11 +257,13 @@ const getVideoById = asyncHandler(async (req, res) => {
         },
         {
             $project:{
+                totalLikes:0,
                isPublished:0,
                updatedAt:0
             }
         }
     ])
+    cache.set(cacheKey, video[0]);
 return res
 .status(200)
 .json(
@@ -286,6 +305,7 @@ const updateVideo = asyncHandler(async (req, res) => {
     createdVideo.thumbnail=thumbnail.url;
 
     await createdVideo.save({validateBeforeSave:false});
+    cache.del('allVideos','video');
 
     return res
     .status(200)
@@ -314,6 +334,9 @@ const deleteVideo = asyncHandler(async (req, res) => {
     if(!deletedvideo){
         throw new ApiError(400,"error while deleting video")
     }
+    
+    cache.del('allVideos','video');
+
     return res.status(200)
     .json(
         new ApiResponse(200,"Video deleted successfully",{})
@@ -332,7 +355,7 @@ const togglePublishStatus = asyncHandler(async (req, res) => {
     createdVideo.isPublished = !createdVideo.isPublished;
     await createdVideo.save({ validateBeforeSave: false });
 
-    
+    cache.del('allVideos','video');
     return res
     .status(200)
     .json(
@@ -357,6 +380,7 @@ const updateViewCount=asyncHandler(async(req,res)=>{
     if(!createdVideo){
         throw new ApiError(400,"Unable to increase views count");
     }
+    cache.del('allVideos','video');
     return res
     .status(200)
     .json(
